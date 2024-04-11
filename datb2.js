@@ -14,25 +14,30 @@ const pool = new Pool(config)
 
 // agregar estudiantes
 async function agregar_estudiante(rut, nombre, curso, nivel) {
+    const query = {
+        text: 'INSERT INTO estudiantes (nombre, rut, curso, nivel) VALUES ($1, $2, $3, $4) RETURNING *',
+        values: [ rut,nombre, curso, nivel],
+    }
     try {
-     
-      const query = 'INSERT INTO estudiantes (rut, nombre, curso, nivel) VALUES ($1, $2, $3, $4)'
-      await pool.query(query, [rut, nombre, curso, nivel])
-      console.log('Estudiante agregado correctamente.',)
+         const res = await pool.query(query)
+       
+      console.log('Estudiante agregado:', res.rows[0])
     } catch (e) {
       console.error('Error al agregar estudiante:', e)
-    } finally {
-    
     }
   }
 
 //todos los estudiantes
 async function obtener_estudiantes() {
-    const query = 'SELECT * FROM estudiantes'
+    const query = {
+        text : 'SELECT * FROM estudiantes'
+    }
     
     try {
-      const result = await pool.query(query)
-      console.log('Estudiantes registrados:', result.rows)
+
+      const res= await pool.query(query)
+      console.log('Estudiantes registrados:', res.rows)
+
     } catch (e) {
       console.error('Error al obtener los datos:', e)
     }
@@ -41,10 +46,13 @@ async function obtener_estudiantes() {
 //estudiante por rut
 
 async function e_por_rut(rut){
-    const query = 'SELECT * FROM estudiantes WHERE rut = $1'
+    const query =  {
+        text: 'SELECT * FROM estudiantes WHERE rut = $1',
+        values: [rut],
+    }
 
     try {
-        const result = await pool.query(query, [rut])
+        const result = await pool.query(query)
         console.log('Estudiante encontrado :', result.rows)
     } catch (e) {
         console.error('Error al obtener los datos:', e)
@@ -56,10 +64,14 @@ async function e_por_rut(rut){
 // actualizar estudiante
 
 async function actualizar_estudiante(rut, nombre, curso, nivel) {
-    const query = 'UPDATE estudiantes SET nombre = $2, curso = $3  , nivel = $4 WHERE rut = $1'
+    const query = {
+        text: 'UPDATE estudiantes SET nombre = $2, curso = $3  , nivel = $4 WHERE rut = $1',
+        values: [rut,nombre,curso, nivel],
+    }
   
     try {
-      await pool.query(query, [rut,nombre,curso, nivel])
+
+      await pool.query(query)
       console.log('Estudiante actualizado correctamente.')
     } catch (e) {
       console.error('Error al actualizar estudiante:', e)
@@ -72,10 +84,13 @@ async function actualizar_estudiante(rut, nombre, curso, nivel) {
 
 
 async function eliminar_estudiante(rut) {
-    const query = 'DELETE FROM estudiantes WHERE rut = $1'
+    const query = {
+        text: 'DELETE FROM estudiantes WHERE rut = $1',
+        values: [rut],
+    }
   
     try {
-      await pool.query(query, [rut])
+      await pool.query(query)
       console.log('Estudiante eliminado correctamente.')
     } catch (e) {
       console.error('Error al eliminar estudiante:', e)
